@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">DemoKuaiShou</string>
+    <string name="message">消息</string>
+    <string name="nicheng">昵称:</string>
+</resources>
