@@ -20,7 +20,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.example.kuaishou.login.view.LoginActivity"/>
+        <activity android:name=".login.view.LoginRegisterActiviy"/>
     </application>
 
 </manifest>

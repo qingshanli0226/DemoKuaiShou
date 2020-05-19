@@ -9,18 +9,33 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.kuaishou.demokuaishou.KSUserManager;
 import com.example.kuaishou.demokuaishou.R;
+import com.example.kuaishou.demokuaishou.login.view.LoginRegisterActiviy;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private MainFragmentAdapter mainFragmentAdapter;
+    private TextView loginTv;
+    private ImageView menuImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        loginTv = findViewById(R.id.loginTv);
+        menuImage = findViewById(R.id.menu);
 
+        loginTv.setOnClickListener(this);
+        menuImage.setOnClickListener(this);
+        if (KSUserManager.getInstance().isLogin()) {
+            menuImage.setVisibility(View.VISIBLE);
+            loginTv.setVisibility(View.GONE);
+        } else {
+            loginTv.setVisibility(View.VISIBLE);
+            menuImage.setVisibility(View.GONE);
+        }
         initViewPager();
         initSlideMenu();
     }
@@ -50,5 +65,18 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
         viewPager.setOffscreenPageLimit(3);
         viewPager.setCurrentItem(1);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.loginTv:
+                //跳转到登录界面
+                LoginRegisterActiviy.launch(this);
+
+                break;
+            case R.id.menu:
+                //显示侧滑菜单
+        }
     }
 }
