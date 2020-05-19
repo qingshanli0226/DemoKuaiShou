@@ -2,6 +2,7 @@ package com.example.kuaishou.demokuaishou.net;
 
 
 import com.example.kuaishou.demokuaishou.common.BaseBean;
+import com.example.kuaishou.demokuaishou.home.mode.CityVideoBean;
 import com.example.kuaishou.demokuaishou.home.mode.FindVideoBean;
 import com.example.kuaishou.demokuaishou.home.mode.FindVideoDataBean;
 import com.example.kuaishou.demokuaishou.home.mode.FocusVideoBean;
@@ -18,4 +19,6 @@ public interface NetApiService {
     Observable<BaseBean<List<FindVideoDataBean>>> findVideo();
     @GET("findFocusVideo")
     Observable<FocusVideoBean> findFocusVideo();
+    @GET("findCityVideo")
+    Observable<CityVideoBean> findCityVideo();
 }

@@ -9,14 +9,15 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.example.kuaishou.demokuaishou.R;
+import com.example.kuaishou.demokuaishou.home.mode.CityVideoBean;
 import com.example.kuaishou.demokuaishou.home.mode.FindVideoBean;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CityVideoAdapter extends RecyclerView.Adapter<CityVideoAdapter.FindVideoViewHolder> {
-    private List<FindVideoBean.ResultBean> data=new ArrayList<>();
-    public void updateData(List<FindVideoBean.ResultBean> dataList) {
+    private List<CityVideoBean.ResultBean> data=new ArrayList<>();
+    public void updateData(List<CityVideoBean.ResultBean> dataList) {
         data.clear();
         data.addAll(dataList);
         notifyDataSetChanged();
