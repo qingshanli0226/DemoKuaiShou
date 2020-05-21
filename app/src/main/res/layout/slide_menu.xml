@@ -26,13 +26,15 @@
             android:id="@+id/nicheng"/>
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:textSize="20sp"
             android:layout_toRightOf="@+id/nicheng"
             android:layout_marginLeft="10dp"
+
             android:layout_centerVertical="true"
+            android:text="名字"
             android:id="@+id/name"/>
 
     </RelativeLayout>

@@ -1,24 +1,33 @@
 package com.example.kuaishou.demokuaishou.login.presenter;
 
-import com.example.kuaishou.demokuaishou.common.ErrorBean;
-import com.example.kuaishou.demokuaishou.login.contract.LoginContract;
+import com.bumptech.glide.Registry;
+import com.example.kuaishou.demokuaishou.login.contract.RegisterContract;
 import com.example.kuaishou.demokuaishou.login.mode.LoginBean;
+import com.example.kuaishou.demokuaishou.login.mode.RegisterBean;
 import com.example.kuaishou.demokuaishou.net.RetrofitCreator;
 
 import java.util.HashMap;
 
+import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
-public class LoginPresenterImpl extends LoginContract.LoginPresenter {
+public class RegisterPresenterImpl  extends RegisterContract.RegisterPresenter {
     @Override
-    public void login(String name, String password) {
-        HashMap<String,String> params = new HashMap<>();
+    public void register(String name, String password) {
+        final HashMap<String,String> params = new HashMap<>();
         params.put("name", name);
         params.put("password", password);
-        RetrofitCreator.getNetApiService().login(params)
+        RetrofitCreator.getNetApiService().register(params)
+                .flatMap(new Function<RegisterBean, ObservableSource<LoginBean>>() {
+                    @Override
+                    public ObservableSource<LoginBean> apply(RegisterBean registerBean) throws Exception {
+                        return RetrofitCreator.getNetApiService().login(params);
+                    }
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<LoginBean>() {
@@ -29,14 +38,7 @@ public class LoginPresenterImpl extends LoginContract.LoginPresenter {
 
                     @Override
                     public void onNext(LoginBean loginBean) {
-                        if (loginBean.getCode().equals("200")) {
-                            iHttpView.onLogin(loginBean);
-                        } else  {
-                            ErrorBean errorBean = new ErrorBean();
-                            errorBean.setCode(loginBean.getCode());
-                            errorBean.setMessage(loginBean.getMessage());
-                            iHttpView.showError(errorBean);
-                        }
+                        iHttpView.onLogin(loginBean);
                     }
 
                     @Override

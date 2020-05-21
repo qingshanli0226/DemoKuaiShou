@@ -33,4 +33,7 @@ public interface NetApiService {
     @POST("login")
     @FormUrlEncoded
     Observable<LoginBean> login(@FieldMap HashMap<String,String> params);
+    @POST("autoLogin")
+    @FormUrlEncoded
+    Observable<LoginBean> autoLogin(@FieldMap HashMap<String,String> params);
 }
