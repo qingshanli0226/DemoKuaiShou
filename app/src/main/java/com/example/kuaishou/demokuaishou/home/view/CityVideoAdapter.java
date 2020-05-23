@@ -1,5 +1,6 @@
 package com.example.kuaishou.demokuaishou.home.view;
 
+import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,8 +10,12 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.example.kuaishou.demokuaishou.R;
+import com.example.kuaishou.demokuaishou.cache.CacheManager;
+import com.example.kuaishou.demokuaishou.cache.history.HistoryEntity;
+import com.example.kuaishou.demokuaishou.common.Constant;
 import com.example.kuaishou.demokuaishou.home.mode.CityVideoBean;
 import com.example.kuaishou.demokuaishou.home.mode.FindVideoBean;
+import com.example.kuaishou.demokuaishou.player.PlayerActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +36,21 @@ public class CityVideoAdapter extends RecyclerView.Adapter<CityVideoAdapter.Find
     }
 
     @Override
-    public void onBindViewHolder(@NonNull FindVideoViewHolder findVideoViewHolder, int position) {
+    public void onBindViewHolder(@NonNull final FindVideoViewHolder findVideoViewHolder, final int position) {
+       findVideoViewHolder.videoImg.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View v) {
+               HistoryEntity historyEntity = new HistoryEntity();
+               historyEntity.setCoverImage(data.get(position).getCoverImg());
+               historyEntity.setVideoUrl(data.get(position).getVedioUrl());
+               historyEntity.setUserId(String.valueOf(data.get(position).getUserId()));
+               CacheManager.getInstance().addOneHistoryVideo(historyEntity);
+
+               PlayerActivity.launch((Activity)(findVideoViewHolder.videoImg.getContext()),
+                       Constant.BASE_RESOURCE_URL+data.get(position).getVedioUrl());
+
+           }
+       });
         Glide.with(findVideoViewHolder.videoImg.getContext()).load(data.get(position).getCoverImg()).into(findVideoViewHolder.videoImg);
     }
 

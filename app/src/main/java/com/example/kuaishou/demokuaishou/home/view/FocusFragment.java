@@ -1,7 +1,6 @@
 package com.example.kuaishou.demokuaishou.home.view;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -13,24 +12,8 @@ import android.view.ViewGroup;
 
 import com.example.kuaishou.demokuaishou.R;
 import com.example.kuaishou.demokuaishou.home.contract.FocusVideoContract;
-import com.example.kuaishou.demokuaishou.home.mode.FindVideoBean;
 import com.example.kuaishou.demokuaishou.home.mode.FocusVideoBean;
 import com.example.kuaishou.demokuaishou.home.presenter.FocusVideoPresenter;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.FormBody;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import okio.BufferedSink;
 
 public class FocusFragment extends Fragment implements FocusVideoContract.IFocusView {
 

@@ -13,20 +13,17 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.kuaishou.demokuaishou.R;
+import com.example.kuaishou.demokuaishou.cache.CacheManager;
 import com.example.kuaishou.demokuaishou.common.ErrorBean;
 import com.example.kuaishou.demokuaishou.home.contract.FindVideoContract;
 import com.example.kuaishou.demokuaishou.home.mode.FindVideoBean;
-import com.example.kuaishou.demokuaishou.home.mode.FindVideoDataBean;
 import com.example.kuaishou.demokuaishou.home.presenter.FindVideoPresenter;
 
-import java.util.List;
-
 //
-public class HomeFragment extends Fragment implements FindVideoContract.IFindVideoView {
+public class HomeFragment extends Fragment implements FindVideoContract.IFindVideoView, CacheManager.IHomeDataListener {
 
     private FindVideoAdapter findVideoAdapter;
     private RecyclerView rv;
-    private FindVideoPresenter findVideoPresenter;
     private ProgressBar progressBar;
     @Nullable
     @Override
@@ -50,22 +47,23 @@ public class HomeFragment extends Fragment implements FindVideoContract.IFindVid
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        findVideoPresenter = new FindVideoPresenter();
-        findVideoPresenter.attachView(this);
-        findVideoPresenter.findVideo();
+
+        FindVideoBean findVideoBean = CacheManager.getInstance().getHomeData();
+        if (findVideoBean!=null) {
+            findVideoAdapter.updateData(findVideoBean.getResult());
+        }
+        CacheManager.getInstance().setHomeDataListener(this);
     }
 
     @Override
-    public void onFindVideo(List<FindVideoDataBean> findVideoDataBeanList) {
-        findVideoAdapter.updateData(findVideoDataBeanList);
+    public void onFindVideo(FindVideoBean findVideoBean) {
     }
-
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         //回收视图，避免内存泄漏
-        findVideoPresenter.detachView();
+        CacheManager.getInstance().removeHomeDataListener();
     }
 
     @Override
@@ -81,5 +79,11 @@ public class HomeFragment extends Fragment implements FindVideoContract.IFindVid
     @Override
     public void hideLoading() {
         progressBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onNewHomeDataReceivedFromeServer(FindVideoBean findVideoBean) {
+         findVideoAdapter.updateData(findVideoBean.getResult());
+         Toast.makeText(getActivity(), "更新了" + findVideoBean.getResult().size()+"条数据", Toast.LENGTH_SHORT).show();
     }
 }

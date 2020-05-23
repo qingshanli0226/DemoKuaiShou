@@ -3,7 +3,6 @@ package com.example.kuaishou.demokuaishou.home.contract;
 import com.example.kuaishou.demokuaishou.base.IPresenter;
 import com.example.kuaishou.demokuaishou.base.IView;
 import com.example.kuaishou.demokuaishou.home.mode.FindVideoBean;
-import com.example.kuaishou.demokuaishou.home.mode.FindVideoDataBean;
 
 import java.util.List;
 
@@ -11,7 +10,7 @@ import java.util.List;
 public class FindVideoContract {
 
     public interface IFindVideoView extends IView {//通过该接口，Presenter将获取的数据回调给UI
-        void onFindVideo(List<FindVideoDataBean> findVideoDataBeanList);
+        void onFindVideo(FindVideoBean findVideoBean);
     }
 
     public interface IFindVideoPresenter extends IPresenter<IFindVideoView> {

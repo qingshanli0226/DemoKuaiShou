@@ -1,9 +1,8 @@
-package com.example.kuaishou.demokuaishou;
+package com.example.kuaishou.demokuaishou.user;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
-import android.view.TextureView;
 
 import com.example.kuaishou.demokuaishou.login.mode.LoginBean;
 import com.example.kuaishou.demokuaishou.net.RetrofitCreator;
@@ -47,7 +46,7 @@ public class KSUserManager {
     }
 
     public String getUserName() {
-        return loginBean == null ? "":loginBean.getResult().getName();
+        return loginBean == null || loginBean.getResult() == null? "":loginBean.getResult().getName();
     }
 
     private void autoLogin() {
@@ -67,8 +66,10 @@ public class KSUserManager {
 
                     @Override
                     public void onNext(LoginBean loginBean) {
-                       saveLoginBean(loginBean);
-                       saveToken(loginBean.getResult().getToken());
+                        if (loginBean.getCode().equals("200")) {
+                            saveLoginBean(loginBean);
+                            saveToken(loginBean.getResult().getToken());
+                        }
                     }
 
                     @Override

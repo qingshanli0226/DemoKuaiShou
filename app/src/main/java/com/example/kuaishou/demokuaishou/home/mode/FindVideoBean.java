@@ -1,8 +1,9 @@
 package com.example.kuaishou.demokuaishou.home.mode;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class FindVideoBean {
+public class FindVideoBean implements Serializable{
 
 
     /**
@@ -39,7 +40,7 @@ public class FindVideoBean {
         this.result = result;
     }
 
-    public static class ResultBean {
+    public static class ResultBean implements Serializable{
         /**
          * vedioUrl : http://vfx.mtime.cn/Video/2019/03/18/mp4/190318214226685784.mp4
          * vedioId : 1

@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+//greenDao 第二步
+apply plugin: 'org.greenrobot.greendao'
 
 android {
     compileSdkVersion 28
@@ -9,12 +11,31 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            //选择要添加的对应cpu类型的.so库。直播功能不能运行在模拟器上，因为没有对应的.so库
+            abiFilters 'armeabi', 'armeabi-v7a',  'x86','arm64-v8a', 'x86_64','arm64-v8a'
+            // 还可以添加
+            // 'arm64-v8a', 64 bit ARM architecture,it can use v7 version
+            //              unless you are too much concerned about performance
+            // mips,mips64, There are no devices with MIPS
+            //  x86_64, No android devices and anyway it can use X86 version
+            //  armeabi, very old architecture. Unsupported after Android 4.4
+            // 'x86', Intel based devices
+        }
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+
+    //第四步，配置greenDao生成文件的目录
+    greendao {
+        schemaVersion 1
+        daoPackage 'com.example.kuaishou.demokuaishou.cache.dao'
+        targetGenDir 'src/main/java'
     }
 }
 
@@ -43,4 +64,16 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:28.0.0'
     implementation 'com.github.bumptech.glide:glide:4.3.1'
     implementation project(':slidemenu')
+
+    //greenDao第三步，添加依赖
+    implementation 'org.greenrobot:greendao:3.2.2'
+
+    implementation 'cn.jzvd:jiaozivideoplayer:6.2.4'
+    //导入IJKVideoView播放器
+    implementation 'com.dou361.ijkplayer:jjdxm-ijkplayer:1.0.5'
+
+    implementation 'tv.danmaku.ijk.media:ijkplayer-armv5:0.6.0'
+    implementation 'tv.danmaku.ijk.media:ijkplayer-arm64:0.6.0'  //最小版本21
+    implementation 'tv.danmaku.ijk.media:ijkplayer-x86:0.6.0'
+    implementation 'tv.danmaku.ijk.media:ijkplayer-x86_64:0.6.0'  //最小版本21
 }

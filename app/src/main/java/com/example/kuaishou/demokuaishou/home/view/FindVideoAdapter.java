@@ -1,5 +1,6 @@
 package com.example.kuaishou.demokuaishou.home.view;
 
+import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,16 +10,18 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.example.kuaishou.demokuaishou.R;
+import com.example.kuaishou.demokuaishou.common.Constant;
 import com.example.kuaishou.demokuaishou.home.mode.FindVideoBean;
-import com.example.kuaishou.demokuaishou.home.mode.FindVideoDataBean;
+import com.example.kuaishou.demokuaishou.player.IJKVideoViewActivity;
+import com.example.kuaishou.demokuaishou.player.PlayerActivity;
 
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FindVideoAdapter extends RecyclerView.Adapter<FindVideoAdapter.FindVideoViewHolder> {
-    private List<FindVideoDataBean> data=new ArrayList<>();
-    public void updateData(List<FindVideoDataBean> dataList) {
+    private List<FindVideoBean.ResultBean> data=new ArrayList<>();
+    public void updateData(List<FindVideoBean.ResultBean> dataList) {
         data.clear();
         data.addAll(dataList);
         notifyDataSetChanged();
@@ -32,7 +35,15 @@ public class FindVideoAdapter extends RecyclerView.Adapter<FindVideoAdapter.Find
     }
 
     @Override
-    public void onBindViewHolder(@NonNull FindVideoViewHolder findVideoViewHolder, int position) {
+    public void onBindViewHolder(@NonNull final FindVideoViewHolder findVideoViewHolder, final int position) {
+
+        findVideoViewHolder.videoImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                IJKVideoViewActivity.launch((Activity)(findVideoViewHolder.videoImg.getContext()),
+                        Constant.BASE_RESOURCE_URL+data.get(position).getVedioUrl());
+            }
+        });
         Glide.with(findVideoViewHolder.videoImg.getContext()).load(data.get(position).getCoverImg()).into(findVideoViewHolder.videoImg);
     }
 

@@ -4,7 +4,6 @@ import com.example.kuaishou.demokuaishou.common.BaseBean;
 import com.example.kuaishou.demokuaishou.common.ErrorBean;
 import com.example.kuaishou.demokuaishou.home.contract.FindVideoContract;
 import com.example.kuaishou.demokuaishou.home.mode.FindVideoBean;
-import com.example.kuaishou.demokuaishou.home.mode.FindVideoDataBean;
 import com.example.kuaishou.demokuaishou.net.RetrofitCreator;
 
 import java.util.List;
@@ -41,15 +40,15 @@ public class FindVideoPresenter implements FindVideoContract.IFindVideoPresenter
                         iFindVideoView.hideLoading();
                     }
                 })
-                .subscribe(new Observer<BaseBean<List<FindVideoDataBean>>>() {
+                .subscribe(new Observer<FindVideoBean>() {
                     @Override
                     public void onSubscribe(Disposable d) {
 
                     }
 
                     @Override
-                    public void onNext(BaseBean<List<FindVideoDataBean>> videoBean) {
-                        iFindVideoView.onFindVideo(videoBean.getResult());
+                    public void onNext(FindVideoBean videoBean) {
+                        iFindVideoView.onFindVideo(videoBean);
                     }
 
                     @Override

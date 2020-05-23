@@ -1,10 +1,9 @@
 package com.example.kuaishou.demokuaishou.login.view;
 
-import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.EditText;
 
-import com.example.kuaishou.demokuaishou.KSUserManager;
+import com.example.kuaishou.demokuaishou.user.KSUserManager;
 import com.example.kuaishou.demokuaishou.R;
 import com.example.kuaishou.demokuaishou.base.BaseFragment;
 import com.example.kuaishou.demokuaishou.common.ErrorBean;

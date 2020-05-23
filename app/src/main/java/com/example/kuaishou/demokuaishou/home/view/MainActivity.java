@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.kuaishou.demokuaishou.KSUserManager;
+import com.example.kuaishou.demokuaishou.user.KSUserManager;
 import com.example.kuaishou.demokuaishou.R;
 import com.example.kuaishou.demokuaishou.login.view.LoginRegisterActiviy;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onNewIntent(intent);
 
         switchFragment(intent);
+        updateUIAccordingToLoginStatus();
     }
 
     private void switchFragment(Intent intent) {
@@ -122,12 +123,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onLogin() {
-        updateUIAccordingToLoginStatus();
+        //updateUIAccordingToLoginStatus();
     }
 
     @Override
     public void onLogout() {
-        updateUIAccordingToLoginStatus();
+        //updateUIAccordingToLoginStatus();
     }
 
 
