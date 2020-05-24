@@ -118,6 +118,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.menu:
                 //显示侧滑菜单
+
+                break;
         }
     }
 

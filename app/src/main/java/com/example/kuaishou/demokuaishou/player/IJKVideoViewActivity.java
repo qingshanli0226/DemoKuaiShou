@@ -1,5 +1,6 @@
 package com.example.kuaishou.demokuaishou.player;
 
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -7,6 +8,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.PathMeasure;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -22,6 +25,8 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import com.dou361.ijkplayer.widget.IjkVideoView;
 import com.example.kuaishou.demokuaishou.R;
@@ -35,6 +40,19 @@ public class IJKVideoViewActivity extends AppCompatActivity implements SurfaceHo
     private SurfaceHolder surfaceHolder;
     private Display display;
 
+    //礼物
+    private ImageView giftImage;
+    private Path path = new Path();
+    private PathMeasure pathMeasure;
+    private float[] currentPosition = new float[2];//当前贝塞尔曲线上的坐标值
+    private RelativeLayout rootView;
+
+
+    private int[] startLocation = new int[2];//起始坐标
+    private int[] endLocation = new int[2];//终点坐标
+    private int[] controlLoaction1 = new int[2];//控制坐标1
+    private int[] controlLocation2 = new int[2];//控制坐标2
+
 
     //定义两个坐标变量
     private int x = 0;
@@ -47,13 +65,73 @@ public class IJKVideoViewActivity extends AppCompatActivity implements SurfaceHo
 
         setContentView(R.layout.activity_ijkvideoview);
         videoUrl = getIntent().getStringExtra("videoUrl");
+        rootView = findViewById(R.id.rootView);
+        giftImage = findViewById(R.id.giftImage);
 
         initIJKVideoView();
-
         initRedSurfaceView();
 
         //获取描述当前页面窗口的对象
         display = getWindowManager().getDefaultDisplay();
+
+        animationHandler.sendEmptyMessageDelayed(1,1000);
+    }
+
+    private Handler animationHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            startGiftAnimation();
+            animationHandler.sendEmptyMessageDelayed(1,1000);
+        }
+    };
+
+    private void startGiftAnimation() {
+        //初始化平移的控件
+        final ImageView imageView = new ImageView(this);
+        imageView.setImageResource(R.mipmap.red);
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(120,120);
+        imageView.setLayoutParams(layoutParams);
+        rootView.addView(imageView);
+
+
+        giftImage.getLocationInWindow(startLocation);//系统给起始坐标赋值
+
+        endLocation[0] = startLocation[0];
+        endLocation[1] = startLocation[1]-1200;
+
+        controlLoaction1[0] = startLocation[0] - 200;
+        controlLoaction1[1] = startLocation[1] - 400;
+
+        controlLocation2[0] = startLocation[0] + 200;
+        controlLocation2[1] = startLocation[1] - 800;
+
+
+        path.moveTo(startLocation[0],startLocation[1]);
+        path.cubicTo(controlLoaction1[0],controlLoaction1[1],controlLocation2[0],controlLocation2[1],endLocation[0],endLocation[1]);
+
+        pathMeasure = new PathMeasure(path, false);
+
+        ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, pathMeasure.getLength());//实例化属性动画类，并且告诉属性动画，平移的长度
+        valueAnimator.setDuration(10000);//动画持续时间
+        //属性动画执行时，不停的调用该回调方法，在该方法中，去设置属性动画的属性值，让属性动画，不停的按照属性值执行动画
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                float value = (float) animation.getAnimatedValue();
+                pathMeasure.getPosTan(value,currentPosition,null);//是为了获取下次坐标点
+                imageView.setTranslationX(currentPosition[0]);
+                imageView.setTranslationY(currentPosition[1]);
+                long time = animation.getCurrentPlayTime();//代表已经动画执行的时间
+                float percent = (float) (time/10000.0);//算出比例关系
+
+                imageView.setScaleX(percent);//按照比例关系去缩放我们的控件，开始时控件很小，后来变大
+                imageView.setScaleY(percent);
+                imageView.setAlpha(1-percent);//开始图片清晰，后来变消失
+            }
+        });
+
+        valueAnimator.start();
     }
 
     private void initRedSurfaceView() {
@@ -82,7 +160,7 @@ public class IJKVideoViewActivity extends AppCompatActivity implements SurfaceHo
     protected void onResume() {
         super.onResume();
         ijkVideoView.onResume();
-    }
+        }
 
     @Override
     protected void onPause() {
