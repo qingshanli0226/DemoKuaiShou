@@ -15,9 +15,11 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.Nullable;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -36,6 +38,11 @@ import android.widget.Toast;
 import com.alipay.sdk.app.EnvUtils;
 import com.alipay.sdk.app.PayTask;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.resource.gif.GifDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.dou361.ijkplayer.widget.IjkVideoView;
 import com.example.kuaishou.demokuaishou.R;
 import com.example.kuaishou.demokuaishou.base.BaseActivity;
@@ -49,6 +56,9 @@ import com.example.kuaishou.demokuaishou.player.presenter.IJKVideoViewContract;
 import com.example.kuaishou.demokuaishou.player.presenter.IjkPresenterImpl;
 import com.example.kuaishou.demokuaishou.user.KSUserManager;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Map;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
@@ -412,7 +422,58 @@ public class IJKVideoViewActivity extends BaseActivity<IJKVideoViewContract.IjkP
          giftAnimImage.setVisibility(View.VISIBLE);
                 giftAnimImage.setBackgroundColor(Color.TRANSPARENT);
                 Glide.with(IJKVideoViewActivity.this).load(Constant.BASE_RESOURCE_URL
-                        +((GiftBean.ResultBean)(giftAdapter.getItem(position))).getGif_file()).into(giftAnimImage);
+                        +((GiftBean.ResultBean)(giftAdapter.getItem(position))).getGif_file()).listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        //执行一次隐藏
+                        try {
+                            Field gifStateField = GifDrawable.class.getDeclaredField("state");
+                            gifStateField.setAccessible(true);
+                            Class gifStateClass = Class.forName("com.bumptech.glide.load.resource.gif.GifDrawable$GifState");
+                            Field gifFrameLoaderField = gifStateClass.getDeclaredField("frameLoader");
+                            gifFrameLoaderField.setAccessible(true);
+                            Class gifFrameLoaderClass = Class.forName("com.bumptech.glide.load.resource.gif.GifFrameLoader");
+                            Field gifDecoderField = gifFrameLoaderClass.getDeclaredField("gifDecoder");
+                            gifDecoderField.setAccessible(true);
+                            Class gifDecoderClass = Class.forName("com.bumptech.glide.gifdecoder.GifDecoder");
+                            Object gifDecoder = gifDecoderField.get(gifFrameLoaderField.get(gifStateField.get(resource)));
+                            Method getDelayMethod = gifDecoderClass.getDeclaredMethod("getDelay", int.class);
+                            getDelayMethod.setAccessible(true);
+                            ////设置播放次数
+                            ((GifDrawable) resource).setLoopCount(1);
+                            //获得总帧数
+                            int count = ((GifDrawable) resource).getFrameCount();
+                            int delay = 0;
+                            for (int i = 0; i < count; i++) {
+                                //计算每一帧所需要的时间进行累加
+                                delay += (int) getDelayMethod.invoke(gifDecoder, i);
+                            }
+                            rootView.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    giftAnimImage.setVisibility(View.GONE);
+                                }
+                            },delay);
+                        } catch (NoSuchFieldException e) {
+                            e.printStackTrace();
+                        } catch (ClassNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace();
+                        } catch (NoSuchMethodException e) {
+                            e.printStackTrace();
+                        } catch (InvocationTargetException e) {
+                            e.printStackTrace();
+                        }
+
+                        return false;
+                    }
+                }).into(giftAnimImage);
     }
     private void addMyMoney(int addMoneyValue) {
         //去充值
