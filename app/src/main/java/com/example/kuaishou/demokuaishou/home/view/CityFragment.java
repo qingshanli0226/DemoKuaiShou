@@ -2,7 +2,14 @@ package com.example.kuaishou.demokuaishou.home.view;
 
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import com.example.kuaishou.demokuaishou.R;
@@ -11,11 +18,13 @@ import com.example.kuaishou.demokuaishou.common.ErrorBean;
 import com.example.kuaishou.demokuaishou.home.contract.CityVideoContract;
 import com.example.kuaishou.demokuaishou.home.mode.CityVideoBean;
 import com.example.kuaishou.demokuaishou.home.presenter.CityVideoPresenterImpl;
+import com.example.kuaishou.demokuaishou.player.view.GiftAdapter;
 
 public class CityFragment extends BaseFragment<CityVideoContract.CityVideoPresenter, CityVideoContract.ICityVideoView>implements CityVideoContract.ICityVideoView {
 
     private CityVideoAdapter cityVideoAdapter;
     private RecyclerView rv;
+    private View rootView;
 
     @Override
     protected void initPresenter() {
@@ -25,6 +34,7 @@ public class CityFragment extends BaseFragment<CityVideoContract.CityVideoPresen
     @Override
     protected void initView(View rootView) {
         initRv(rootView);
+        this.rootView = rootView;
     }
 
     @Override
@@ -43,6 +53,7 @@ public class CityFragment extends BaseFragment<CityVideoContract.CityVideoPresen
     @Override
     protected void initData() {
         httpPresenter.findCityVideo();
+
     }
 
     @Override
@@ -64,4 +75,6 @@ public class CityFragment extends BaseFragment<CityVideoContract.CityVideoPresen
     public void hideLoading() {
 
     }
+
+
 }

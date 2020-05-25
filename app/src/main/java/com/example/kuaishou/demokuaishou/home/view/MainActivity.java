@@ -2,12 +2,18 @@ package com.example.kuaishou.demokuaishou.home.view;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +30,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private SlidingMenu slidingMenu;
     private final int DEFAUT_FRAGMENT = 1;
     private ViewPager viewPager;
+    private View rootView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         loginTv.setOnClickListener(this);
         menuImage.setOnClickListener(this);
+        rootView = findViewById(R.id.rootView);
 
         initViewPager();
         initSlideMenu();

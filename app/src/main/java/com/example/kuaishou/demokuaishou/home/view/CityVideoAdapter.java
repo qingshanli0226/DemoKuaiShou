@@ -14,8 +14,7 @@ import com.example.kuaishou.demokuaishou.cache.CacheManager;
 import com.example.kuaishou.demokuaishou.cache.history.HistoryEntity;
 import com.example.kuaishou.demokuaishou.common.Constant;
 import com.example.kuaishou.demokuaishou.home.mode.CityVideoBean;
-import com.example.kuaishou.demokuaishou.home.mode.FindVideoBean;
-import com.example.kuaishou.demokuaishou.player.PlayerActivity;
+import com.example.kuaishou.demokuaishou.player.view.PlayerActivity;
 
 import java.util.ArrayList;
 import java.util.List;

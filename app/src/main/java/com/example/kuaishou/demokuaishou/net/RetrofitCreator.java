@@ -29,6 +29,7 @@ public class RetrofitCreator {
                 .readTimeout(5,TimeUnit.SECONDS)//读数据超时
                 .writeTimeout(5,TimeUnit.SECONDS)//写网络数据超时
                 .addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))//设置打印log的级别
+                .addInterceptor(new TokenInterceptor())
                 .build();
 
         Retrofit retrofit = new Retrofit.Builder()

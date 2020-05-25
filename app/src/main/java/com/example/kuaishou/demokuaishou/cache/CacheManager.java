@@ -8,6 +8,7 @@ import com.example.kuaishou.demokuaishou.cache.dao.HistoryEntityDao;
 import com.example.kuaishou.demokuaishou.cache.history.HistoryEntity;
 import com.example.kuaishou.demokuaishou.home.mode.FindVideoBean;
 import com.example.kuaishou.demokuaishou.net.RetrofitCreator;
+import com.example.kuaishou.demokuaishou.player.mode.GiftBean;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -30,6 +31,9 @@ public class CacheManager {
     private final String DB_NAME="ks.db";
     private HistoryEntityDao historyEntityDao;//该实例是实际操作数据库的对象
 
+    //礼物缓存
+    private GiftBean giftBean;
+
     private ExecutorService singleExecutorService = Executors.newSingleThreadExecutor();//使用线程池进行异步操作
 
     private static CacheManager instance;
@@ -47,11 +51,48 @@ public class CacheManager {
         getHomeDataFromAcache();//先从本地将首页的数据加载到内存中
         getHomeDataFromServer();//从服务端获取新的首页数据
 
+        //获取礼物数据
+        getGiftData();
+
         //初始化数据库
         DaoMaster.OpenHelper openHelper = new DaoMaster.DevOpenHelper(context, DB_NAME);
         DaoMaster daoMaster = new DaoMaster(openHelper.getWritableDatabase());
         DaoSession daoSession = daoMaster.newSession();
         historyEntityDao = daoSession.getHistoryEntityDao();
+    }
+
+    //获取礼物缓存数据
+    public List<GiftBean.ResultBean> getGiftDataList() {
+        return giftBean.getResult();
+    }
+
+    private void getGiftData() {
+        RetrofitCreator.getNetApiService().getGiftData()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<GiftBean>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(GiftBean giftBean) {
+                        if (giftBean.getCode() == 200) {
+                            CacheManager.this.giftBean = giftBean;
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
     }
 
     //去服务端获取数据，更新首页数据

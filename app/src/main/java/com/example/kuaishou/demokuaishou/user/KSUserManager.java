@@ -118,6 +118,15 @@ public class KSUserManager {
 
     }
 
+    //返回当前用户的账户资金数
+    public String getMoney() {
+        return (String) loginBean.getResult().getMoney();
+    }
+    //更新个人账户
+    public void updateMoney(String money) {
+        loginBean.getResult().setMoney(money);
+    }
+
     public void addLoginLister(ILoginListener iLoginListener) {
         if (!loginListenerList.contains(iLoginListener)) {
             loginListenerList.add(iLoginListener);

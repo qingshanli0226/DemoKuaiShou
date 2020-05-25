@@ -27,10 +27,10 @@
             android:launchMode="singleTask" />
         <activity android:name=".login.view.LoginRegisterActiviy"/>
 
-        <activity android:name=".player.PlayerActivity"
+        <activity android:name=".player.view.PlayerActivity"
             android:screenOrientation="portrait"
             android:theme="@style/TranslucentTheme"></activity>
-        <activity android:name=".player.IJKVideoViewActivity"
+        <activity android:name=".player.view.IJKVideoViewActivity"
             android:screenOrientation="portrait"
             android:theme="@style/TranslucentTheme"></activity>
     </application>

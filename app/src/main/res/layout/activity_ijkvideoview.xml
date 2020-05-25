@@ -26,6 +26,13 @@
         android:layout_marginRight="100dp"
         android:id="@+id/giftImage"/>
 
+    <ImageView
+        android:id="@+id/giftAnimImage"
+        android:layout_width="500dp"
+        android:layout_height="500dp"
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
+
 
 
 </RelativeLayout>

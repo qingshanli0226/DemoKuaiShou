@@ -1,4 +1,4 @@
-package com.example.kuaishou.demokuaishou.player;
+package com.example.kuaishou.demokuaishou.player.view;
 
 import android.animation.ValueAnimator;
 import android.app.Activity;
@@ -14,31 +14,53 @@ import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Display;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
+import com.alipay.sdk.app.EnvUtils;
+import com.alipay.sdk.app.PayTask;
+import com.bumptech.glide.Glide;
 import com.dou361.ijkplayer.widget.IjkVideoView;
 import com.example.kuaishou.demokuaishou.R;
+import com.example.kuaishou.demokuaishou.base.BaseActivity;
+import com.example.kuaishou.demokuaishou.cache.CacheManager;
+import com.example.kuaishou.demokuaishou.common.Constant;
+import com.example.kuaishou.demokuaishou.common.ErrorBean;
+import com.example.kuaishou.demokuaishou.player.mode.GiftBean;
+import com.example.kuaishou.demokuaishou.player.mode.OrderInfoBean;
+import com.example.kuaishou.demokuaishou.player.mode.UpdataMoneyBean;
+import com.example.kuaishou.demokuaishou.player.presenter.IJKVideoViewContract;
+import com.example.kuaishou.demokuaishou.player.presenter.IjkPresenterImpl;
+import com.example.kuaishou.demokuaishou.user.KSUserManager;
+
+import java.util.Map;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 
-public class IJKVideoViewActivity extends AppCompatActivity implements SurfaceHolder.Callback {
+//需要和服务端交互，所以使用MVP框架
+public class IJKVideoViewActivity extends BaseActivity<IJKVideoViewContract.IjkPresenter, IJKVideoViewContract.IIJKVideoView> implements SurfaceHolder.Callback, IJKVideoViewContract.IIJKVideoView, View.OnClickListener {
     private IjkVideoView ijkVideoView;
     private String videoUrl;
     private SurfaceView redSurfaceView;
     private SurfaceHolder surfaceHolder;
     private Display display;
+    private ImageView giftAnimImage;
 
     //礼物
     private ImageView giftImage;
@@ -47,34 +69,53 @@ public class IJKVideoViewActivity extends AppCompatActivity implements SurfaceHo
     private float[] currentPosition = new float[2];//当前贝塞尔曲线上的坐标值
     private RelativeLayout rootView;
 
-
     private int[] startLocation = new int[2];//起始坐标
     private int[] endLocation = new int[2];//终点坐标
     private int[] controlLoaction1 = new int[2];//控制坐标1
     private int[] controlLocation2 = new int[2];//控制坐标2
-
 
     //定义两个坐标变量
     private int x = 0;
     private int y = 0;
     private long time = 0;
 
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    private PopupWindow popupWindow;
+    private GiftAdapter giftAdapter;
 
-        setContentView(R.layout.activity_ijkvideoview);
+    private int addMoneyValue;
+
+    @Override
+    protected void initPresenter() {
+        httpPresenter = new IjkPresenterImpl();
+    }
+
+    @Override
+    protected void initData() {
+        EnvUtils.setEnv(EnvUtils.EnvEnum.SANDBOX);//设置沙箱环境.
+    }
+
+    @Override
+    protected void initView() {
         videoUrl = getIntent().getStringExtra("videoUrl");
         rootView = findViewById(R.id.rootView);
         giftImage = findViewById(R.id.giftImage);
+
+        giftImage.setOnClickListener(this);
+        giftAnimImage = findViewById(R.id.giftAnimImage);
 
         initIJKVideoView();
         initRedSurfaceView();
 
         //获取描述当前页面窗口的对象
         display = getWindowManager().getDefaultDisplay();
+        //animationHandler.sendEmptyMessageDelayed(1,1000);
 
-        animationHandler.sendEmptyMessageDelayed(1,1000);
+        initPopupWindow();
+    }
+
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activity_ijkvideoview;
     }
 
     private Handler animationHandler = new Handler() {
@@ -140,7 +181,6 @@ public class IJKVideoViewActivity extends AppCompatActivity implements SurfaceHo
         redSurfaceView.getHolder().setFormat(PixelFormat.TRANSPARENT);//将SurfaceView的背景设置成透明
         surfaceHolder = redSurfaceView.getHolder();
         surfaceHolder.addCallback(this);
-
     }
 
     private void initIJKVideoView() {
@@ -157,28 +197,18 @@ public class IJKVideoViewActivity extends AppCompatActivity implements SurfaceHo
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void resume() {
         ijkVideoView.onResume();
-        }
+    }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void pause() {
         ijkVideoView.onPause();
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void destroy() {
         ijkVideoView.stopPlayback();
-    }
-
-    public static void launch(Activity activity, String videoUrl) {
-        Intent intent = new Intent();
-        intent.putExtra("videoUrl", videoUrl);
-        intent.setClass(activity, IJKVideoViewActivity.class);
-        activity.startActivity(intent);
     }
 
     @Override
@@ -213,8 +243,6 @@ public class IJKVideoViewActivity extends AppCompatActivity implements SurfaceHo
                 return true;//返回true，代表这个点击事件，将由surfaceView来处理，事件分发到此结束
             }
         });
-
-
     }
 
     Handler handler = new Handler() {
@@ -270,5 +298,129 @@ public class IJKVideoViewActivity extends AppCompatActivity implements SurfaceHo
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
 
+    }
+
+    private boolean isAdd = false;
+    private int clickGiftPosition =0;
+    @Override
+    public void onUpdataMoneyData(UpdataMoneyBean updataMoneyBean) {
+        if (isAdd) {
+            Toast.makeText(this, "增加虚拟币成功:" + updataMoneyBean.getResult(), Toast.LENGTH_SHORT).show();
+        } else {
+            showGiftAnim(clickGiftPosition);
+            Toast.makeText(this, "购物礼物成功:" + updataMoneyBean.getResult(), Toast.LENGTH_SHORT).show();
+
+        }
+    }
+
+    @Override
+    public void onOrderInfo(final OrderInfoBean orderInfoBean) {
+        //第二步 获取了订单信息，去调用支付宝完成支付
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                PayTask payTask = new PayTask(IJKVideoViewActivity.this);
+                //第三步调用支付宝API去完成支付
+                Map<String,String> result = payTask.payV2(orderInfoBean.getResult().getOrderInfo(), true);
+                //判断是否支付成功
+                //第四步，支付宝通过返回值知会我们支付成功
+                if (result.get("resultStatus").equals("9000")) {
+                    //第5步，到我们的服务端去更新虚拟币
+                    updateMyMoney();
+                }
+
+            }
+        });
+
+        thread.start();
+
+
+    }
+
+    private void updateMyMoney() {
+        httpPresenter.updateMoney(String.valueOf(addMoneyValue));
+
+    }
+
+    @Override
+    public void showError(ErrorBean errorBean) {
+
+    }
+
+    @Override
+    public void showLoading() {
+
+    }
+
+    @Override
+    public void hideLoading() {
+
+    }
+
+    public static void launch(Activity activity, String videoUrl) {
+        Intent intent = new Intent();
+        intent.putExtra("videoUrl", videoUrl);
+        intent.setClass(activity, IJKVideoViewActivity.class);
+        activity.startActivity(intent);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.giftImage) {
+            showGiftPopupWindow();
+        }
+    }
+
+    private void initPopupWindow() {
+        View giftPopupView = LayoutInflater.from(this).inflate(R.layout.gift_popup_window,null,false);
+        popupWindow = new PopupWindow(giftPopupView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+
+        GridView gridView = giftPopupView.findViewById(R.id.giftGridView);
+        giftAdapter = new GiftAdapter();
+        gridView.setAdapter(giftAdapter);
+        giftAdapter.updateData(CacheManager.getInstance().getGiftDataList());
+        popupWindow.setFocusable(true);
+        popupWindow.setOutsideTouchable(true);
+        popupWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //展示礼物
+                popupWindow.dismiss();
+                clickGiftPosition = position;
+
+                //检查资金是否充足,个人账户的钱在什么地方存着呢?
+                int giftValue = Integer.parseInt(((GiftBean.ResultBean)(giftAdapter.getItem(position))).getPrice());
+                int myMoneyValue = (KSUserManager.getInstance().getMoney() == null)?0:Integer.parseInt(KSUserManager.getInstance().getMoney());
+                if (myMoneyValue < giftValue) {//资金不足
+                    //去充值
+                    isAdd = true;
+                    addMoneyValue = giftValue-myMoneyValue;
+                    addMyMoney(giftValue-myMoneyValue);
+                } else {
+                    //资金充足,可以发送礼物了
+                    isAdd = false;
+                    httpPresenter.updateMoney(String.valueOf(myMoneyValue-giftValue));
+                }
+
+            }
+        });
+    }
+
+    private void showGiftAnim(int position) {
+         giftAnimImage.setVisibility(View.VISIBLE);
+                giftAnimImage.setBackgroundColor(Color.TRANSPARENT);
+                Glide.with(IJKVideoViewActivity.this).load(Constant.BASE_RESOURCE_URL
+                        +((GiftBean.ResultBean)(giftAdapter.getItem(position))).getGif_file()).into(giftAnimImage);
+    }
+    private void addMyMoney(int addMoneyValue) {
+        //去充值
+        //第一步先下订单
+        httpPresenter.getOrderInfo("buy ks bi", String.valueOf(addMoneyValue));
+    }
+
+    private void showGiftPopupWindow() {
+        popupWindow.showAtLocation(rootView,Gravity.BOTTOM, 0,0);
     }
 }
