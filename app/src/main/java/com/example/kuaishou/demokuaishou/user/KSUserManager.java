@@ -27,6 +27,8 @@ public class KSUserManager {
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
 
+    private List<IMoneyValueChangedListener> iMoneyValueChangedListeners = new LinkedList<>();
+
     private KSUserManager() {
     }
 
@@ -125,6 +127,11 @@ public class KSUserManager {
     //更新个人账户
     public void updateMoney(String money) {
         loginBean.getResult().setMoney(money);
+
+        //去通知资金变化
+        for(IMoneyValueChangedListener listener:iMoneyValueChangedListeners) {
+            listener.onMoneyChanged(money);
+        }
     }
 
     public void addLoginLister(ILoginListener iLoginListener) {
@@ -137,6 +144,23 @@ public class KSUserManager {
         if (loginListenerList.contains(iLoginListener)) {
             loginListenerList.remove(iLoginListener);
         }
+    }
+
+    public void registerMoneyListener(IMoneyValueChangedListener listener) {
+        if (!iMoneyValueChangedListeners.contains(listener)) {
+            iMoneyValueChangedListeners.add(listener);
+        }
+
+    }
+
+    public void unRegisterMoneyListener(IMoneyValueChangedListener listener) {
+        if (iMoneyValueChangedListeners.contains(listener)) {
+            iMoneyValueChangedListeners.remove(listener);
+        }
+    }
+
+    public interface IMoneyValueChangedListener{
+        void onMoneyChanged(String moneyValue);
     }
 
     public interface ILoginListener{

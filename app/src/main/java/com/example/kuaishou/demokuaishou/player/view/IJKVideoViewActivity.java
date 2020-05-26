@@ -33,6 +33,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alipay.sdk.app.EnvUtils;
@@ -64,7 +65,7 @@ import java.util.Map;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 
 //需要和服务端交互，所以使用MVP框架
-public class IJKVideoViewActivity extends BaseActivity<IJKVideoViewContract.IjkPresenter, IJKVideoViewContract.IIJKVideoView> implements SurfaceHolder.Callback, IJKVideoViewContract.IIJKVideoView, View.OnClickListener {
+public class IJKVideoViewActivity extends BaseActivity<IJKVideoViewContract.IjkPresenter, IJKVideoViewContract.IIJKVideoView> implements SurfaceHolder.Callback, IJKVideoViewContract.IIJKVideoView, View.OnClickListener, KSUserManager.IMoneyValueChangedListener {
     private IjkVideoView ijkVideoView;
     private String videoUrl;
     private SurfaceView redSurfaceView;
@@ -93,6 +94,7 @@ public class IJKVideoViewActivity extends BaseActivity<IJKVideoViewContract.IjkP
     private GiftAdapter giftAdapter;
 
     private int addMoneyValue;
+    private TextView moneyTv;
 
     @Override
     protected void initPresenter() {
@@ -102,6 +104,8 @@ public class IJKVideoViewActivity extends BaseActivity<IJKVideoViewContract.IjkP
     @Override
     protected void initData() {
         EnvUtils.setEnv(EnvUtils.EnvEnum.SANDBOX);//设置沙箱环境.
+
+        KSUserManager.getInstance().registerMoneyListener(this);
     }
 
     @Override
@@ -219,6 +223,7 @@ public class IJKVideoViewActivity extends BaseActivity<IJKVideoViewContract.IjkP
     @Override
     protected void destroy() {
         ijkVideoView.stopPlayback();
+        KSUserManager.getInstance().unRegisterMoneyListener(this);
     }
 
     @Override
@@ -386,6 +391,9 @@ public class IJKVideoViewActivity extends BaseActivity<IJKVideoViewContract.IjkP
         popupWindow = new PopupWindow(giftPopupView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 
         GridView gridView = giftPopupView.findViewById(R.id.giftGridView);
+        moneyTv = giftPopupView.findViewById(R.id.moneyTv);
+        String moneyStr = String.valueOf(KSUserManager.getInstance().getMoney() == null?0:Integer.parseInt(KSUserManager.getInstance().getMoney()));
+        moneyTv.setText(moneyStr);
         giftAdapter = new GiftAdapter();
         gridView.setAdapter(giftAdapter);
         giftAdapter.updateData(CacheManager.getInstance().getGiftDataList());
@@ -416,6 +424,8 @@ public class IJKVideoViewActivity extends BaseActivity<IJKVideoViewContract.IjkP
 
             }
         });
+
+
     }
 
     private void showGiftAnim(int position) {
@@ -430,7 +440,7 @@ public class IJKVideoViewActivity extends BaseActivity<IJKVideoViewContract.IjkP
 
                     @Override
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        //执行一次隐藏
+                        //执行一次加载gif动画，然后隐藏它
                         try {
                             Field gifStateField = GifDrawable.class.getDeclaredField("state");
                             gifStateField.setAccessible(true);
@@ -484,4 +494,13 @@ public class IJKVideoViewActivity extends BaseActivity<IJKVideoViewContract.IjkP
     private void showGiftPopupWindow() {
         popupWindow.showAtLocation(rootView,Gravity.BOTTOM, 0,0);
     }
+
+    @Override
+    public void onMoneyChanged(String moneyValue) {
+        if (moneyTv!=null) {
+            moneyTv.setText(moneyValue);
+        }
+    }
+
+
 }

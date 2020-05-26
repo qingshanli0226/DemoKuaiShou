@@ -4,6 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:id="@+id/moneyTv"
+        android:gravity="left"
+        android:textColor="@android:color/white"
+        android:layout_marginLeft="10dp"/>
+
     <GridView
         android:id="@+id/giftGridView"
         android:layout_width="match_parent"
