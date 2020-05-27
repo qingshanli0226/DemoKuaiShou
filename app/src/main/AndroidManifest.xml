@@ -33,6 +33,10 @@
         <activity android:name=".player.view.IJKVideoViewActivity"
             android:screenOrientation="portrait"
             android:theme="@style/TranslucentTheme"></activity>
+
+        <activity android:name=".player.view.SlideVideoViewActivity"
+            android:screenOrientation="portrait"/>
+
     </application>
 
 </manifest>

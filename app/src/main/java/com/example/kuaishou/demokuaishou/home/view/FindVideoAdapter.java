@@ -13,6 +13,7 @@ import com.example.kuaishou.demokuaishou.R;
 import com.example.kuaishou.demokuaishou.common.Constant;
 import com.example.kuaishou.demokuaishou.home.mode.FindVideoBean;
 import com.example.kuaishou.demokuaishou.player.view.IJKVideoViewActivity;
+import com.example.kuaishou.demokuaishou.player.view.SlideVideoViewActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,8 +39,10 @@ public class FindVideoAdapter extends RecyclerView.Adapter<FindVideoAdapter.Find
         findVideoViewHolder.videoImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                IJKVideoViewActivity.launch((Activity)(findVideoViewHolder.videoImg.getContext()),
-                        Constant.BASE_RESOURCE_URL+data.get(position).getVedioUrl());
+                /*IJKVideoViewActivity.launch((Activity)(findVideoViewHolder.videoImg.getContext()),
+                        Constant.BASE_RESOURCE_URL+data.get(position).getVedioUrl());*/
+
+                SlideVideoViewActivity.launch((Activity)(findVideoViewHolder.videoImg.getContext()),position);
             }
         });
         Glide.with(findVideoViewHolder.videoImg.getContext()).load(data.get(position).getCoverImg()).into(findVideoViewHolder.videoImg);
