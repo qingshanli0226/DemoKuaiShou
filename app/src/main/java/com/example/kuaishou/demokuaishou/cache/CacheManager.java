@@ -5,6 +5,7 @@ import android.content.Context;
 import com.example.kuaishou.demokuaishou.cache.dao.DaoMaster;
 import com.example.kuaishou.demokuaishou.cache.dao.DaoSession;
 import com.example.kuaishou.demokuaishou.cache.dao.HistoryEntityDao;
+import com.example.kuaishou.demokuaishou.cache.dao.SearhEntityDao;
 import com.example.kuaishou.demokuaishou.cache.history.HistoryEntity;
 import com.example.kuaishou.demokuaishou.home.mode.FindVideoBean;
 import com.example.kuaishou.demokuaishou.net.RetrofitCreator;
@@ -30,6 +31,8 @@ public class CacheManager {
     private final String HOME_DATA="homeData";
     private final String DB_NAME="ks.db";
     private HistoryEntityDao historyEntityDao;//该实例是实际操作数据库的对象
+
+    private SearhEntityDao searhEntityDao;//对数据库中搜索历史记录操作的类
 
     //礼物缓存
     private GiftBean giftBean;
@@ -59,6 +62,7 @@ public class CacheManager {
         DaoMaster daoMaster = new DaoMaster(openHelper.getWritableDatabase());
         DaoSession daoSession = daoMaster.newSession();
         historyEntityDao = daoSession.getHistoryEntityDao();
+        setSearhEntityDao(daoSession.getSearhEntityDao());
     }
 
     //获取礼物缓存数据
@@ -133,7 +137,7 @@ public class CacheManager {
 
     //将从服务端获取的数据存入Acache中
     private void saveHomeDataIntoAcache(final FindVideoBean findVideoBean) {
-        singleExecutorService.execute(new Runnable() {
+        getSingleExecutorService().execute(new Runnable() {
             @Override
             public void run() {
                 aCache.put(HOME_DATA, findVideoBean);
@@ -143,7 +147,7 @@ public class CacheManager {
 
     //耗时操作放到子线程中
     private void getHomeDataFromAcache() {
-        singleExecutorService.execute(new Runnable() {
+        getSingleExecutorService().execute(new Runnable() {
             @Override
             public void run() {
                 findVideoBean = (FindVideoBean) aCache.getAsObject(HOME_DATA);
@@ -163,6 +167,22 @@ public class CacheManager {
         this.iHomeDataListener = null;
     }
 
+    public SearhEntityDao getSearhEntityDao() {
+        return searhEntityDao;
+    }
+
+    public void setSearhEntityDao(SearhEntityDao searhEntityDao) {
+        this.searhEntityDao = searhEntityDao;
+    }
+
+    public ExecutorService getSingleExecutorService() {
+        return singleExecutorService;
+    }
+
+    public void setSingleExecutorService(ExecutorService singleExecutorService) {
+        this.singleExecutorService = singleExecutorService;
+    }
+
     //定义接口，去通知页面有新的数据到来
     public interface IHomeDataListener {
         void onNewHomeDataReceivedFromeServer(FindVideoBean findVideoBean);
@@ -171,7 +191,7 @@ public class CacheManager {
 
     //添加浏览的历史记录
     public void addOneHistoryVideo(final HistoryEntity historyEntity) {
-        singleExecutorService.execute(new Runnable() {
+        getSingleExecutorService().execute(new Runnable() {
             @Override
             public void run() {
                 historyEntityDao.insert(historyEntity);
@@ -193,5 +213,8 @@ public class CacheManager {
     public List<HistoryEntity> getHistoryVideo() {
         return historyEntityDao.queryBuilder().list();
     }
+
+
+
 
 }

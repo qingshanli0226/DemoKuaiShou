@@ -150,7 +150,7 @@ public class SlideVideoViewActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
-        if (currentVideoView!=null) {
+        if (currentVideoView!=null && currentVideoView.isPlaying()) {
             currentVideoView.onPause();
         }
     }

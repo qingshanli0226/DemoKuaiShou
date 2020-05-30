@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+
     <application
         android:name=".KSApplication"
         android:allowBackup="true"
@@ -32,10 +34,13 @@
             android:theme="@style/TranslucentTheme"></activity>
         <activity android:name=".player.view.IJKVideoViewActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/TranslucentTheme"></activity>
+            android:theme="@style/TranslucentTheme"
+            android:launchMode="singleTask"></activity>
 
         <activity android:name=".player.view.SlideVideoViewActivity"
             android:screenOrientation="portrait"/>
+
+        <activity android:name=".search.view.SearchActivity"/>
 
     </application>
 

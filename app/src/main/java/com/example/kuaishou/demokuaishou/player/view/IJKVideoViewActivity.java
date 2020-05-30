@@ -20,6 +20,7 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -27,6 +28,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -96,6 +98,15 @@ public class IJKVideoViewActivity extends BaseActivity<IJKVideoViewContract.IjkP
     private int addMoneyValue;
     private TextView moneyTv;
 
+
+    private boolean isHasStart = false;//当前应用是否之前已经启动过
+    private int currentPlayPosition = 0;//代表当前播放器播放的位置
+    private WindowManager.LayoutParams layoutParams;
+    private WindowManager windowManager;
+    private View littleRootView;
+
+    private IjkVideoView littleIjk;
+
     @Override
     protected void initPresenter() {
         httpPresenter = new IjkPresenterImpl();
@@ -113,12 +124,28 @@ public class IJKVideoViewActivity extends BaseActivity<IJKVideoViewContract.IjkP
         videoUrl = getIntent().getStringExtra("videoUrl");
         rootView = findViewById(R.id.rootView);
         giftImage = findViewById(R.id.giftImage);
+        rootView.setOnClickListener(this);
 
         giftImage.setOnClickListener(this);
         giftAnimImage = findViewById(R.id.giftAnimImage);
 
+
         initIJKVideoView();
         initRedSurfaceView();
+        SurfaceView testS = findViewById(R.id.testSurface);
+        testS.getHolder().setFormat(PixelFormat.TRANSPARENT);
+        testS.setZOrderOnTop(true);
+        testS.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (ijkVideoView.isPlaying()) {//播放器正在播放，停止播放
+                    ijkVideoView.pause();
+                } else {//如果不处于播放状态，就继续播放
+                   ijkVideoView.start();
+                }
+            }
+        });
 
         //获取描述当前页面窗口的对象
         display = getWindowManager().getDefaultDisplay();
@@ -212,13 +239,129 @@ public class IJKVideoViewActivity extends BaseActivity<IJKVideoViewContract.IjkP
 
     @Override
     protected void resume() {
-        ijkVideoView.onResume();
+        if (isHasStart) {//切到后台，重新显示，继续从之前的位置开始播放
+            ijkVideoView.setVideoURI(Uri.parse(videoUrl));
+            ijkVideoView.setRender(ijkVideoView.RENDER_TEXTURE_VIEW);
+            ijkVideoView.seekTo(currentPlayPosition);
+        }
+
+        isHasStart = true;//当前页面已经启动ok了
+    }
+
+    //该标记的作用，来标记当前是否是我们主动关掉的页面
+    private boolean isBack = false;
+    @Override
+    public void onBackPressed() {
+        isBack = true;
+        super.onBackPressed();
+
     }
 
     @Override
     protected void pause() {
-        ijkVideoView.onPause();
+        currentPlayPosition = ijkVideoView.getCurrentPosition();
+        ijkVideoView.stopPlayback();
+
+        //只有当不是我们主动关掉该页面时，当页面切到后台时，立即显示一个小窗口，继续播放视频
+        if (!isBack) {
+            displayPlayLittleWindow();
+        }
     }
+
+    private void displayPlayLittleWindow() {
+        //创建小窗口去播放视频
+        windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+        //用来设置创建窗口的参数
+        layoutParams = new WindowManager.LayoutParams();
+        //设置窗口的类型,该窗口类型是系统级别,系统级别的窗口，可以显示任何页面的上方。而应用级别的窗口只能显示在当前页面的上方，例如PopupWindow，Dialog
+        layoutParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;//这个需要在清单文件里添加权限
+
+        layoutParams.format = PixelFormat.TRANSPARENT;//设置背景透明
+        //设置的标记的意思是。在当前小窗口显示时，后面页面的控件依然可以点击
+        layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+                | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+
+        //设置窗口的宽度和高度
+        layoutParams.width = 300;
+        layoutParams.height = 500;
+
+        //设置窗口显示的布局
+        littleRootView = LayoutInflater.from(this).inflate(R.layout.window_little,null);
+        windowManager.addView(littleRootView, layoutParams);//将小窗口显示出来
+        littleRootView.setOnTouchListener(littleOnTouchListener);
+
+        littleIjk = littleRootView.findViewById(R.id.littleIjk);
+        SurfaceView littleS = littleRootView.findViewById(R.id.littleS);
+        littleS.setZOrderOnTop(true);
+        littleS.getHolder().setFormat(PixelFormat.TRANSPARENT);
+        //小窗口继续播放视频的内容
+        littleIjk.setVideoURI(Uri.parse(videoUrl));
+        littleIjk.setOnPreparedListener(new IMediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(IMediaPlayer iMediaPlayer) {
+                littleIjk.start();
+                littleIjk.seekTo(currentPlayPosition);//让播放器在指定的位置继续播放视频
+            }
+        });
+
+        //点击关闭按钮，去关闭小窗口
+        littleRootView.findViewById(R.id.close).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                littleIjk.stopPlayback();
+                windowManager.removeView(littleRootView);
+            }
+        });
+    }
+
+    //定义一个OnTouchListener, 获取用户在屏幕上手指移动的坐标
+    private View.OnTouchListener littleOnTouchListener = new View.OnTouchListener() {
+
+        private float x = 0,y = 0;//记录手指在屏幕DOWN坐标
+        private float littleX = 0, littleY = 0;//记录小窗口在手指DOWN时，在屏幕的坐标值
+
+
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    x = event.getRawX();//获取当前点击的事件相对于屏幕的觉对坐标
+                    y = event.getRawY();
+                    littleX = layoutParams.x;
+                    littleY = layoutParams.y;
+                    break;
+                case MotionEvent.ACTION_MOVE:
+
+                    float dx = (event.getRawX() - x);//计算手指在X轴的移动偏移量
+                    float dy = (event.getRawY() - y);//计算手指在Y轴的移动偏移量
+
+                    layoutParams.x = (int) (littleX + dx);
+                    layoutParams.y = (int) (littleY + dy);
+
+                    //更新小窗口在当前屏幕的位置
+                    windowManager.updateViewLayout(littleRootView, layoutParams);
+
+                    break;
+                case MotionEvent.ACTION_UP:
+                    //当手指滑动的距离小于10个像素时，认为是点击事件,否则认为是滑动事件
+                    if (Math.abs(event.getRawX() -x) > 20 || Math.abs(event.getRawY()-y)>20) {
+                    } else {
+                        //现获取小窗口当前播放的位置
+                        currentPlayPosition = littleIjk.getCurrentPosition();
+                        littleIjk.stopPlayback();//关掉小窗口的播放器
+                        windowManager.removeView(littleRootView);//从屏幕里删除小窗口
+                        Intent intent = new Intent();//启动播放Activity
+                        intent.setClass(IJKVideoViewActivity.this, IJKVideoViewActivity.class);
+                        IJKVideoViewActivity.this.startActivity(intent);//会执行activity的onResume函数,该函数会继续播放视
+                    }
+                    break;
+                    default:
+                        break;
+            }
+            return true;
+        }
+    };
 
     @Override
     protected void destroy() {

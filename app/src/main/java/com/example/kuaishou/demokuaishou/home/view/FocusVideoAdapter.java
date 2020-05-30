@@ -1,5 +1,6 @@
 package com.example.kuaishou.demokuaishou.home.view;
 
+import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,7 +10,9 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.example.kuaishou.demokuaishou.R;
+import com.example.kuaishou.demokuaishou.common.Constant;
 import com.example.kuaishou.demokuaishou.home.mode.FocusVideoBean;
+import com.example.kuaishou.demokuaishou.player.view.IJKVideoViewActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +33,14 @@ public class FocusVideoAdapter extends RecyclerView.Adapter<FocusVideoAdapter.Fo
     }
 
     @Override
-    public void onBindViewHolder(@NonNull FocusVideoViewHolder focusVideoViewHolder, int position) {
+    public void onBindViewHolder(@NonNull final FocusVideoViewHolder focusVideoViewHolder, final int position) {
+        focusVideoViewHolder.videoImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                IJKVideoViewActivity.launch((Activity)(focusVideoViewHolder.videoImg.getContext()),
+                        Constant.BASE_RESOURCE_URL+data.get(position).getVedioUrl());
+            }
+        });
         Glide.with(focusVideoViewHolder.videoImg.getContext()).load(data.get(position).getCoverImg()).into(focusVideoViewHolder.videoImg);
     }
 

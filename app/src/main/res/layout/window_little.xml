@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/close"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:gravity="left|center_vertical"
+        android:textSize="20sp"
+        android:paddingLeft="10dp"
+        android:textColor="@color/colorAccent"
+        android:text="关闭"
+        />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <com.dou361.ijkplayer.widget.IjkVideoView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/littleIjk">
+
+            <SurfaceView
+                android:id="@+id/littleS"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </com.dou361.ijkplayer.widget.IjkVideoView>
+    </RelativeLayout>
+
+
+
+</LinearLayout>

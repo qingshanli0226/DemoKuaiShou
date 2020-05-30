@@ -122,6 +122,9 @@ public class KSUserManager {
 
     //返回当前用户的账户资金数
     public String getMoney() {
+        if (loginBean == null) {
+            return null;
+        }
         return (String) loginBean.getResult().getMoney();
     }
     //更新个人账户

@@ -17,6 +17,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.kuaishou.demokuaishou.search.view.SearchActivity;
 import com.example.kuaishou.demokuaishou.user.KSUserManager;
 import com.example.kuaishou.demokuaishou.R;
 import com.example.kuaishou.demokuaishou.login.view.LoginRegisterActiviy;
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         loginTv.setOnClickListener(this);
         menuImage.setOnClickListener(this);
         rootView = findViewById(R.id.rootView);
+        findViewById(R.id.searchImg).setOnClickListener(this);
 
         initViewPager();
         initSlideMenu();
@@ -127,6 +129,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.menu:
                 //显示侧滑菜单
 
+                break;
+
+            case R.id.searchImg:
+                SearchActivity.launch(this);
                 break;
         }
     }
