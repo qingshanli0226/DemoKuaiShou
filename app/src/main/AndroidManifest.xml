@@ -8,6 +8,15 @@
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-feature android:name="android.hardware.Camera"/>
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+
     <application
         android:name=".KSApplication"
         android:allowBackup="true"
@@ -41,6 +50,11 @@
             android:screenOrientation="portrait"/>
 
         <activity android:name=".search.view.SearchActivity"/>
+
+        <activity android:name=".record.view.RecordActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".live.TXLiveActivity"/>
 
     </application>
 

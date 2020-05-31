@@ -2,21 +2,17 @@ package com.example.kuaishou.demokuaishou.home.view;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.kuaishou.demokuaishou.live.TXLiveActivity;
+import com.example.kuaishou.demokuaishou.record.view.RecordActivity;
 import com.example.kuaishou.demokuaishou.search.view.SearchActivity;
 import com.example.kuaishou.demokuaishou.user.KSUserManager;
 import com.example.kuaishou.demokuaishou.R;
@@ -44,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         menuImage.setOnClickListener(this);
         rootView = findViewById(R.id.rootView);
         findViewById(R.id.searchImg).setOnClickListener(this);
+        findViewById(R.id.btnRecord).setOnClickListener(this);
 
         initViewPager();
         initSlideMenu();
@@ -133,6 +130,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             case R.id.searchImg:
                 SearchActivity.launch(this);
+                break;
+
+            case R.id.btnRecord:
+                TXLiveActivity.launch(this);
                 break;
         }
     }
