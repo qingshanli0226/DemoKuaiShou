@@ -11,12 +11,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.kuaishou.demokuaishou.live.TXLiveActivity;
 import com.example.kuaishou.demokuaishou.record.view.RecordActivity;
 import com.example.kuaishou.demokuaishou.search.view.SearchActivity;
 import com.example.kuaishou.demokuaishou.user.KSUserManager;
 import com.example.kuaishou.demokuaishou.R;
 import com.example.kuaishou.demokuaishou.login.view.LoginRegisterActiviy;
+import com.example.kuaishou.demokuaishou.live.view.LiveActivity;
+import com.example.kuaishou.demokuaishou.live.view.PreparePlayLiveActivity;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, KSUserManager.ILoginListener {
@@ -41,6 +42,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         rootView = findViewById(R.id.rootView);
         findViewById(R.id.searchImg).setOnClickListener(this);
         findViewById(R.id.btnRecord).setOnClickListener(this);
+        findViewById(R.id.btnLive).setOnClickListener(this);
+        findViewById(R.id.btnPlayLive).setOnClickListener(this);
 
         initViewPager();
         initSlideMenu();
@@ -133,7 +136,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.btnRecord:
-                TXLiveActivity.launch(this);
+                RecordActivity.launch(this);
+                break;
+
+            case R.id.btnLive:
+                LiveActivity.launch(this);
+                break;
+
+            case R.id.btnPlayLive:
+                PreparePlayLiveActivity.launch(this);
                 break;
         }
     }

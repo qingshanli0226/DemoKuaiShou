@@ -81,4 +81,7 @@ dependencies {
 
     //导入腾讯直播sdk
     implementation 'com.tencent.liteavsdk:LiteAVSDK_Smart:latest.release'
+
+    //弹幕库
+    implementation 'com.github.ctiao:DanmakuFlameMaster:0.9.25'
 }

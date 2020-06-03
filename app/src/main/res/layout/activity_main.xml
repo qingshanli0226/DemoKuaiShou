@@ -60,6 +60,7 @@
             android:layout_weight="9">
         </android.support.v4.view.ViewPager>
 
+
         <Button
             android:id="@+id/btnRecord"
             android:layout_width="50dp"
@@ -69,6 +70,25 @@
             android:layout_alignParentRight="true"
             android:layout_marginRight="20dp"
             android:text="录制"/>
+        <Button
+            android:id="@+id/btnLive"
+            android:layout_width="50dp"
+            android:layout_height="80dp"
+            android:layout_above="@id/btnRecord"
+            android:layout_marginBottom="5dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="20dp"
+            android:text="直播"/>
+
+        <Button
+            android:id="@+id/btnPlayLive"
+            android:layout_width="50dp"
+            android:layout_height="80dp"
+            android:layout_above="@id/btnLive"
+            android:layout_marginBottom="5dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="20dp"
+            android:text="看直播"/>
     </RelativeLayout>
 
 

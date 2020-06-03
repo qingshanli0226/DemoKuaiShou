@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <com.dou361.ijkplayer.widget.IjkVideoView
+            android:id="@+id/ijkVideoView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </com.dou361.ijkplayer.widget.IjkVideoView>
+
+        <master.flame.danmaku.ui.widget.DanmakuSurfaceView
+            android:id="@+id/danmakuSurfaceView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true">
+
+        <EditText
+            android:id="@+id/inputText"
+            android:layout_width="400dp"
+            android:layout_height="50dp"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="10dp"
+            android:layout_centerVertical="true"
+            />
+
+
+        <Button
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:id="@+id/btnSend"
+            android:text="发送弹幕"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"/>
+
+    </RelativeLayout>
+
+
+
+</RelativeLayout>

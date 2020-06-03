@@ -9,9 +9,11 @@ import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.kuaishou.demokuaishou.R;
@@ -42,6 +44,7 @@ public class RecordActivity extends AppCompatActivity implements View.OnClickLis
         findViewById(R.id.btnStartCamera).setOnClickListener(this);
         findViewById(R.id.btnStopCamera).setOnClickListener(this);
         findViewById(R.id.btnPlayCamera).setOnClickListener(this);
+        findViewById(R.id.btnSize).setOnClickListener(this);
 
         surfaceView = findViewById(R.id.surfaceView);
         surfaceHolder = surfaceView.getHolder();
@@ -68,6 +71,10 @@ public class RecordActivity extends AppCompatActivity implements View.OnClickLis
                 if (videoFile.exists()) {
                     playVideo();
                 }
+                break;
+            case R.id.btnSize:
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(500, 200, Gravity.CENTER);
+                surfaceView.setLayoutParams(layoutParams);
 
                 break;
         }
@@ -109,7 +116,7 @@ public class RecordActivity extends AppCompatActivity implements View.OnClickLis
         mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.MPEG_4_SP);//设置视频编码器
         mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);//设置音频编码器
         mediaRecorder.setVideoSize(640,480);//设置视频图像的大小
-        mediaRecorder.setVideoFrameRate(30);//设置录制视频的帧率
+        mediaRecorder.setVideoFrameRate(20);//设置录制视频的帧率
         mediaRecorder.setVideoEncodingBitRate(3*1024*1024);//设置录制视频的码率
         mediaRecorder.setOrientationHint(90);
         mediaRecorder.setPreviewDisplay(surfaceHolder.getSurface());//配置录制视频的预览页面

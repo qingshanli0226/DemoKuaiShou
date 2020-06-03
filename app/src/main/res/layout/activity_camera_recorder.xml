@@ -21,6 +21,14 @@ android:layout_height="match_parent">
     android:text="播放视频"/>
 
 
+    <Button
+        android:id="@+id/btnSize"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="改变尺寸"/>
+
+
+
 <SurfaceView
     android:id="@+id/surfaceView"
     android:layout_width="match_parent"
