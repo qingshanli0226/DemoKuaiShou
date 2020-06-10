@@ -12,6 +12,7 @@ import com.example.kuaishou.demokuaishou.home.view.MainActivity;
 import com.example.kuaishou.demokuaishou.login.contract.LoginContract;
 import com.example.kuaishou.demokuaishou.login.mode.LoginBean;
 import com.example.kuaishou.demokuaishou.login.presenter.LoginPresenterImpl;
+import com.umeng.analytics.MobclickAgent;
 
 
 public class LoginFragment extends BaseFragment<LoginContract.LoginPresenter, LoginContract.ILoginView> implements View.OnClickListener,
@@ -64,6 +65,9 @@ public class LoginFragment extends BaseFragment<LoginContract.LoginPresenter, Lo
         KSUserManager.getInstance().saveToken(loginBean.getResult().getToken());
         getActivity().finish();
         MainActivity.launch(getActivity(), 1);
+
+        //统计当天那些登录了我的应用
+        MobclickAgent.onProfileSignIn(loginBean.getResult().getId());
     }
 
     @Override

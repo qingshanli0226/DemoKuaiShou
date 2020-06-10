@@ -2,4 +2,7 @@
     <string name="app_name">DemoKuaiShou</string>
     <string name="message">消息</string>
     <string name="nicheng">昵称:</string>
+    <string name="fragment_home_content">关注</string>
+    <string name="fragment_type_content">发现</string>
+    <string name="fragment_shopcar_content">同城</string>
 </resources>

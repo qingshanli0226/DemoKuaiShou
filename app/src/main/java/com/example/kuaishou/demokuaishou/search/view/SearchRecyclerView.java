@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
 
+//第三种类型的自定义view，我们实现一个控件，该控件继承，系统一个控件，通过重写系统控件的方法，来实现增加或减少系统控件的功能.
 public class SearchRecyclerView extends RecyclerView {
     private boolean isDisplayAll = false;//是否全部显示
     public SearchRecyclerView(@NonNull Context context) {

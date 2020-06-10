@@ -13,14 +13,17 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.dou361.ijkplayer.widget.IjkVideoView;
+import com.example.kuaishou.demokuaishou.AdrActivity;
 import com.example.kuaishou.demokuaishou.R;
+import com.example.kuaishou.demokuaishou.base.BaseActivity;
 import com.example.kuaishou.demokuaishou.cache.CacheManager;
 import com.example.kuaishou.demokuaishou.common.Constant;
 import com.example.kuaishou.demokuaishou.home.mode.FindVideoBean;
+import com.sina.weibo.sdk.constant.WBConstants;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 
-public class SlideVideoViewActivity extends AppCompatActivity {
+public class SlideVideoViewActivity extends BaseActivity {
     private SlideVideoViewAdapter slideVideoViewAdapter;
 
 
@@ -32,17 +35,21 @@ public class SlideVideoViewActivity extends AppCompatActivity {
 
     private RecyclerView slideRv;
 
-
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.activity_slide_video_view);
-
-        initSlideRv();
-
+    protected void create() {
         initData();
     }
+
+    @Override
+    protected void initView() {
+        initSlideRv();
+    }
+
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activity_slide_video_view;
+    }
+
 
     private void initData() {
         //初始化列表数据
@@ -139,25 +146,25 @@ public class SlideVideoViewActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void resume() {
+        super.resume();
+
         if (currentVideoView!=null) {
-            currentVideoView.onResume();
+            currentVideoView.start();
         }
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void pause() {
+        super.pause();
 
         if (currentVideoView!=null && currentVideoView.isPlaying()) {
-            currentVideoView.onPause();
+            currentVideoView.pause();
         }
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void destroy() {
         if (currentVideoView!=null) {
             currentVideoView.stopPlayback();
             currentVideoView=null;

@@ -4,14 +4,13 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.widget.LinearLayoutManager;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.kuaishou.demokuaishou.R;
-import com.example.kuaishou.demokuaishou.base.BaseActivity;
+import com.example.kuaishou.demokuaishou.base.BaseMVPActivity;
 import com.example.kuaishou.demokuaishou.cache.CacheManager;
 import com.example.kuaishou.demokuaishou.cache.dao.SearhEntityDao;
 import com.example.kuaishou.demokuaishou.common.ErrorBean;
@@ -20,12 +19,10 @@ import com.example.kuaishou.demokuaishou.search.mode.SearchBean;
 import com.example.kuaishou.demokuaishou.search.mode.SearhEntity;
 import com.example.kuaishou.demokuaishou.search.presenter.SearchPresenterImpl;
 
-import org.greenrobot.greendao.Property;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchActivity extends BaseActivity<SearchPresenterImpl, SearchContract.ISearchView> implements SearchContract.ISearchView, View.OnClickListener {
+public class SearchMVPActivity extends BaseMVPActivity<SearchPresenterImpl, SearchContract.ISearchView> implements SearchContract.ISearchView, View.OnClickListener {
     private List<SearhEntity> searhEntityList = new ArrayList<>();
 
     private EditText searchEditText;
@@ -89,7 +86,7 @@ public class SearchActivity extends BaseActivity<SearchPresenterImpl, SearchCont
 
     public static void launch(Activity activity) {
         Intent intent = new Intent();
-        intent.setClass(activity, SearchActivity.class);
+        intent.setClass(activity, SearchMVPActivity.class);
         activity.startActivity(intent);
     }
 

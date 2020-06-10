@@ -20,7 +20,6 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -48,7 +47,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.dou361.ijkplayer.widget.IjkVideoView;
 import com.example.kuaishou.demokuaishou.R;
-import com.example.kuaishou.demokuaishou.base.BaseActivity;
+import com.example.kuaishou.demokuaishou.base.BaseMVPActivity;
 import com.example.kuaishou.demokuaishou.cache.CacheManager;
 import com.example.kuaishou.demokuaishou.common.Constant;
 import com.example.kuaishou.demokuaishou.common.ErrorBean;
@@ -67,7 +66,7 @@ import java.util.Map;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 
 //需要和服务端交互，所以使用MVP框架
-public class IJKVideoViewActivity extends BaseActivity<IJKVideoViewContract.IjkPresenter, IJKVideoViewContract.IIJKVideoView> implements SurfaceHolder.Callback, IJKVideoViewContract.IIJKVideoView, View.OnClickListener, KSUserManager.IMoneyValueChangedListener {
+public class IJKVideoViewMVPActivity extends BaseMVPActivity<IJKVideoViewContract.IjkPresenter, IJKVideoViewContract.IIJKVideoView> implements SurfaceHolder.Callback, IJKVideoViewContract.IIJKVideoView, View.OnClickListener, KSUserManager.IMoneyValueChangedListener {
     private IjkVideoView ijkVideoView;
     private String videoUrl;
     private SurfaceView redSurfaceView;
@@ -239,6 +238,7 @@ public class IJKVideoViewActivity extends BaseActivity<IJKVideoViewContract.IjkP
 
     @Override
     protected void resume() {
+        super.resume();
         if (isHasStart) {//切到后台，重新显示，继续从之前的位置开始播放
             ijkVideoView.setVideoURI(Uri.parse(videoUrl));
             ijkVideoView.setRender(ijkVideoView.RENDER_TEXTURE_VIEW);
@@ -259,6 +259,7 @@ public class IJKVideoViewActivity extends BaseActivity<IJKVideoViewContract.IjkP
 
     @Override
     protected void pause() {
+        super.pause();
         currentPlayPosition = ijkVideoView.getCurrentPosition();
         ijkVideoView.stopPlayback();
 
@@ -352,8 +353,8 @@ public class IJKVideoViewActivity extends BaseActivity<IJKVideoViewContract.IjkP
                         littleIjk.stopPlayback();//关掉小窗口的播放器
                         windowManager.removeView(littleRootView);//从屏幕里删除小窗口
                         Intent intent = new Intent();//启动播放Activity
-                        intent.setClass(IJKVideoViewActivity.this, IJKVideoViewActivity.class);
-                        IJKVideoViewActivity.this.startActivity(intent);//会执行activity的onResume函数,该函数会继续播放视
+                        intent.setClass(IJKVideoViewMVPActivity.this, IJKVideoViewMVPActivity.class);
+                        IJKVideoViewMVPActivity.this.startActivity(intent);//会执行activity的onResume函数,该函数会继续播放视
                     }
                     break;
                     default:
@@ -477,7 +478,7 @@ public class IJKVideoViewActivity extends BaseActivity<IJKVideoViewContract.IjkP
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                PayTask payTask = new PayTask(IJKVideoViewActivity.this);
+                PayTask payTask = new PayTask(IJKVideoViewMVPActivity.this);
                 //第三步调用支付宝API去完成支付
                 Map<String,String> result = payTask.payV2(orderInfoBean.getResult().getOrderInfo(), true);
                 //判断是否支付成功
@@ -518,7 +519,7 @@ public class IJKVideoViewActivity extends BaseActivity<IJKVideoViewContract.IjkP
     public static void launch(Activity activity, String videoUrl) {
         Intent intent = new Intent();
         intent.putExtra("videoUrl", videoUrl);
-        intent.setClass(activity, IJKVideoViewActivity.class);
+        intent.setClass(activity, IJKVideoViewMVPActivity.class);
         activity.startActivity(intent);
     }
 
@@ -571,12 +572,39 @@ public class IJKVideoViewActivity extends BaseActivity<IJKVideoViewContract.IjkP
 
     }
 
+    private String getGiftPath(int index) {
+        String gifFilePath = null;
+        switch (index) {
+            case 0:
+                gifFilePath = Constant.GIFF_1;
+                break;
+            case 1:
+                gifFilePath = Constant.GIFF_2;
+                break;
+            case 2:
+                gifFilePath = Constant.GIFF_3;
+                break;
+            case 3:
+                gifFilePath = Constant.GIFF_4;
+                break;
+            case 4:
+                gifFilePath = Constant.GIFF_5;
+                break;
+            case 5:
+                gifFilePath = Constant.GIFF_6;
+                break;
+        }
+        return gifFilePath;
+    }
+
     private void showGiftAnim(int position) {
          giftAnimImage.setVisibility(View.VISIBLE);
                 giftAnimImage.setBackgroundColor(Color.TRANSPARENT);
-                Glide.with(IJKVideoViewActivity.this).load(Constant.BASE_RESOURCE_URL
+            /*    Glide.with(IJKVideoViewMVPActivity.this).load(Constant.BASE_RESOURCE_URL
                         +((GiftBean.ResultBean)(giftAdapter.getItem(position))).getGif_file()).listener(new RequestListener<Drawable>() {
-                    @Override
+     */   Glide.with(IJKVideoViewMVPActivity.this).load(getGiftPath(position)).listener(new RequestListener<Drawable>() {
+
+            @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
                         return false;
                     }

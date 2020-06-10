@@ -3,33 +3,29 @@ package com.example.kuaishou.demokuaishou.base;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
-//定义Acitivity的MVP基类
-public abstract class BaseActivity<T extends IPresenter, V extends IView> extends AppCompatActivity {
+import com.example.kuaishou.demokuaishou.AdrActivity;
+import com.example.kuaishou.demokuaishou.cache.CacheManager;
 
-    protected T httpPresenter;
+public abstract class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(getLayoutId());
+        Log.d("LQS", "onCreate....");
         initView();
-        initPresenter();
-        httpPresenter.attachView((V)this);
-        initData();
-
+        create();
     }
 
-    protected abstract void initPresenter();
-
-    protected abstract void initData();
-
+    protected abstract void create();
     protected abstract void initView();
-
     protected abstract int getLayoutId();
 
     @Override
     protected void onResume() {
+        Log.d("LQS", "onResume....");
         super.onResume();
         resume();
     }
@@ -41,18 +37,21 @@ public abstract class BaseActivity<T extends IPresenter, V extends IView> extend
     }
 
     protected void pause(){
-
+        CacheManager.getInstance().saveAdrTime(System.currentTimeMillis());//开始存广告时间
     }
 
     protected void resume() {
-
+        long adrTime = CacheManager.getInstance().getAdrTime();
+        if (System.currentTimeMillis() - adrTime > 5 * 1000) {
+            //启动广告页
+            AdrActivity.launch(this);
+        }
     }
-
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        httpPresenter.detachView();
+
         destroy();
     }
 

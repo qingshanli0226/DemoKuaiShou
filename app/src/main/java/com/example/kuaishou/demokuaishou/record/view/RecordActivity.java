@@ -10,10 +10,13 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.kuaishou.demokuaishou.R;
@@ -21,7 +24,7 @@ import com.example.kuaishou.demokuaishou.R;
 import java.io.File;
 import java.io.IOException;
 
-public class RecordActivity extends AppCompatActivity implements View.OnClickListener, SurfaceHolder.Callback {
+public class RecordActivity extends AppCompatActivity implements View.OnClickListener, SurfaceHolder.Callback,RecordTimeView.IRecordTimeEndListener {
 
     private MediaRecorder mediaRecorder;//录制视频的类
     private Camera camera;//操作硬件相机的类，通过这个类可以拿到相机拍摄的相机数据
@@ -32,6 +35,10 @@ public class RecordActivity extends AppCompatActivity implements View.OnClickLis
     private SurfaceHolder surfaceHolder;
 
     private File videoFile;
+
+    private ImageView btnStartRecordImageView;
+    private RecordTimeView recordTimeView;
+    private TextView timeRecordTv;
 
 
     @Override
@@ -52,7 +59,47 @@ public class RecordActivity extends AppCompatActivity implements View.OnClickLis
 
         //相机将数据推送到surfaceView，需要准备一个缓存
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
+        btnStartRecordImageView = findViewById(R.id.btnStartRecord);
+        recordTimeView = findViewById(R.id.recordTimeView);
+        timeRecordTv = findViewById(R.id.timeTv);
+
+        initRecordListener();
     }
+
+    private void initRecordListener() {
+        btnStartRecordImageView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        //开始录制1，调用录制函数进行视频录制，2，要调用recordView去显示录制时间动画
+                        recordTimeView.startRecord();//开始显示录制时间动画
+                        if (!isRecord) {
+                            startRecord();
+                        }
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        //停止录制1,停止录制视频 2，停止动画
+                        recordTimeView.stopRecord();//停止显示录制时间动画
+                        if (isRecord) {//正在录制的话，停止录制
+                            stopRecord();
+                        }
+                        break;
+
+                        default:
+                            break;
+                }
+
+
+                return true;
+            }
+        });
+
+        recordTimeView.setiRecordTimeEndListener(this);
+    }
+
     @Override
     public void onClick(View v) {
 
@@ -163,5 +210,22 @@ public class RecordActivity extends AppCompatActivity implements View.OnClickLis
         Intent intent = new Intent();
         intent.setClass(activity, RecordActivity.class);
         activity.startActivity(intent);
+    }
+
+    @Override
+    public void onRecordTimeEnd() {
+        //必须停止录制视频
+        if (isRecord) {
+            stopRecord();
+        }
+
+        playVideo();
+        Toast.makeText(this, "停止录制完毕,正在预览", Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void onRecordTimeUpdate(String time) {
+         timeRecordTv.setText(time);
     }
 }

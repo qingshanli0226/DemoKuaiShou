@@ -12,7 +12,7 @@ import com.bumptech.glide.Glide;
 import com.example.kuaishou.demokuaishou.R;
 import com.example.kuaishou.demokuaishou.common.Constant;
 import com.example.kuaishou.demokuaishou.home.mode.FocusVideoBean;
-import com.example.kuaishou.demokuaishou.player.view.IJKVideoViewActivity;
+import com.example.kuaishou.demokuaishou.player.view.IJKVideoViewMVPActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,7 @@ public class FocusVideoAdapter extends RecyclerView.Adapter<FocusVideoAdapter.Fo
         focusVideoViewHolder.videoImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                IJKVideoViewActivity.launch((Activity)(focusVideoViewHolder.videoImg.getContext()),
+                IJKVideoViewMVPActivity.launch((Activity)(focusVideoViewHolder.videoImg.getContext()),
                         Constant.BASE_RESOURCE_URL+data.get(position).getVedioUrl());
             }
         });

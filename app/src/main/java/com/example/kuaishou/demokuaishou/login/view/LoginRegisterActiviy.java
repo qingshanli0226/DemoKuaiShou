@@ -8,18 +8,31 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.example.kuaishou.demokuaishou.R;
+import com.example.kuaishou.demokuaishou.base.BaseActivity;
 
 //该类管理两个Fragment，一个是注册Fragment，一个是登录Fragment,默认显示登录Fragment
-public class LoginRegisterActiviy extends AppCompatActivity {
+public class LoginRegisterActiviy extends BaseActivity {//添加广告功能
     private ViewPager viewPager;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_login_register);
-
         initViewPager();
+    }
+
+    @Override
+    protected void create() {
+    }
+
+    @Override
+    protected void initView() {
+        initViewPager();
+    }
+
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activity_login_register;
     }
 
     private void initViewPager() {

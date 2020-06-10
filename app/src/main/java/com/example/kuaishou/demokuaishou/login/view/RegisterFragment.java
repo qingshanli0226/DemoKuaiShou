@@ -12,6 +12,7 @@ import com.example.kuaishou.demokuaishou.login.contract.RegisterContract;
 import com.example.kuaishou.demokuaishou.login.mode.LoginBean;
 import com.example.kuaishou.demokuaishou.login.mode.RegisterBean;
 import com.example.kuaishou.demokuaishou.login.presenter.RegisterPresenterImpl;
+import com.umeng.analytics.MobclickAgent;
 
 
 public class RegisterFragment extends BaseFragment<RegisterContract.RegisterPresenter, RegisterContract.IRegisterView> implements View.OnClickListener, RegisterContract.IRegisterView
@@ -69,6 +70,8 @@ public class RegisterFragment extends BaseFragment<RegisterContract.RegisterPres
         KSUserManager.getInstance().saveToken(loginBean.getResult().getToken());
         getActivity().finish();
         MainActivity.launch(getActivity(), 1);
+
+        MobclickAgent.onProfileSignIn(loginBean.getResult().getId());
     }
 
     @Override

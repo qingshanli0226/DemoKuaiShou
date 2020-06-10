@@ -13,12 +13,12 @@
     android:layout_width="match_parent"
     android:layout_height="0dp"
     android:layout_weight="1">
-    <android.support.design.widget.TabLayout
-        android:layout_width="300dp"
-        android:layout_height="match_parent"
-        android:id="@+id/tabLayout"
-        android:layout_centerInParent="true">
-    </android.support.design.widget.TabLayout>
+   <com.example.kuaishou.demokuaishou.home.view.NavigationBar
+       android:id="@+id/navigationBar"
+       android:layout_width="300dp"
+       android:layout_height="match_parent"
+       android:layout_centerHorizontal="true">
+   </com.example.kuaishou.demokuaishou.home.view.NavigationBar>
 
     <ImageView
         android:layout_width="wrap_content"
@@ -53,12 +53,12 @@
         android:layout_height="0dp"
         android:layout_weight="9">
 
-        <android.support.v4.view.ViewPager
-            android:id="@+id/viewPager"
+        <FrameLayout
+            android:id="@+id/frameLayoutId"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="9">
-        </android.support.v4.view.ViewPager>
+        </FrameLayout>
 
 
         <Button

@@ -16,11 +16,14 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.http.Body;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Streaming;
+import retrofit2.http.Url;
 
 //网络请求的接口,相当于IMode
 public interface NetApiService {
@@ -47,5 +50,11 @@ public interface NetApiService {
     @POST("updateMoney")
     @FormUrlEncoded//参数的形式是表单的
     Observable<UpdataMoneyBean> updateMoney(@FieldMap HashMap<String,String> params);
+
+    //定义下载文件的接口
+    @GET
+    @Streaming
+    Observable<ResponseBody> downloadFile(@Url String url);
+
 
 }

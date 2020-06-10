@@ -3,6 +3,9 @@ package com.example.kuaishou.demokuaishou.home.view;
 import android.app.Activity;
 import android.content.Intent;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,29 +14,39 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.kuaishou.demokuaishou.AdrActivity;
+import com.example.kuaishou.demokuaishou.base.BaseActivity;
+import com.example.kuaishou.demokuaishou.cache.CacheManager;
 import com.example.kuaishou.demokuaishou.record.view.RecordActivity;
-import com.example.kuaishou.demokuaishou.search.view.SearchActivity;
+import com.example.kuaishou.demokuaishou.search.view.SearchMVPActivity;
 import com.example.kuaishou.demokuaishou.user.KSUserManager;
 import com.example.kuaishou.demokuaishou.R;
 import com.example.kuaishou.demokuaishou.login.view.LoginRegisterActiviy;
 import com.example.kuaishou.demokuaishou.live.view.LiveActivity;
 import com.example.kuaishou.demokuaishou.live.view.PreparePlayLiveActivity;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+import com.umeng.analytics.MobclickAgent;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, KSUserManager.ILoginListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener, KSUserManager.ILoginListener, NavigationBar.ISelectedListener {
 
-    private MainFragmentAdapter mainFragmentAdapter;
     private TextView loginTv;
     private ImageView menuImage;
     private SlidingMenu slidingMenu;
-    private final int DEFAUT_FRAGMENT = 1;
-    private ViewPager viewPager;
     private View rootView;
+    private NavigationBar navigationBar;
+
+    private Fragment currentFragment;//当前正在显示的Fragment
+    private Fragment[] fragments = new Fragment[]{ new FocusFragment(), new HomeFragment(), new CityFragment()};
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    protected void create() {
+
+        //默认进入HomeFragment
+        switchFragmentByIndex(1);
+    }
+
+    @Override
+    protected void initView() {
         loginTv = findViewById(R.id.loginTv);
         menuImage = findViewById(R.id.menu);
 
@@ -45,11 +58,56 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.btnLive).setOnClickListener(this);
         findViewById(R.id.btnPlayLive).setOnClickListener(this);
 
-        initViewPager();
+        //initViewPager();
+        initNavigationView();
+
         initSlideMenu();
-        switchFragment(getIntent());
+        switchFragmentByIndex(getIntent().getIntExtra("fragmentIndex",0));
+        navigationBar.setSelectedColor(getIntent().getIntExtra("fragmentIndex",0));
+
         updateUIAccordingToLoginStatus();
         KSUserManager.getInstance().addLoginLister(this);
+    }
+
+    private void initNavigationView() {
+        navigationBar = findViewById(R.id.navigationBar);
+        navigationBar.setiSelectedListener(this);
+        navigationBar.setTabTile(new String[]{"1712", "1710", "1704"});
+    }
+
+
+    @Override
+    public void onTabSelected(int index) {
+        switchFragmentByIndex(index);
+
+    }
+
+    private void switchFragmentByIndex(int index) {
+        Fragment fragment = fragments[index];
+        //如果要切换的Fragment，已经显示出来了，就直接返回
+        if (fragment == null || fragment == currentFragment) {
+            return;
+        }
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        if (currentFragment!=null) {
+            fragmentTransaction.hide(currentFragment);//先隐藏当前显示的Fragment
+        }
+
+        if (fragment.isAdded()) {//如果说之前已经添加到系统中
+            fragmentTransaction.show(fragment).commit();//直接显示出来
+        } else {//如果说之前没有添加到系统中，现在就添加到系统中，添加后，会自动显示出来
+            fragmentTransaction.add(R.id.frameLayoutId, fragment).commit();
+        }
+
+        currentFragment = fragment;
+    }
+
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activity_main;
     }
 
     //当Activity实例存在时，你调用startActivity时，如果Activity的lacunchMode不是默认的标准模式，是signeltTask模式
@@ -58,13 +116,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
 
-        switchFragment(intent);
+        switchFragmentByIndex(getIntent().getIntExtra("fragmentIndex",0));
+        navigationBar.setSelectedColor(getIntent().getIntExtra("fragmentIndex",0));
         updateUIAccordingToLoginStatus();
     }
 
-    private void switchFragment(Intent intent) {
-        int fragmentIndex = intent.getIntExtra("fragmentIndex", -1);
-        viewPager.setCurrentItem(fragmentIndex);
+    @Override
+    protected void resume() {
+        super.resume();
+        MobclickAgent.onResume(this);
+    }
+
+    @Override
+    protected void pause() {
+        super.pause();
+        MobclickAgent.onPause(this);
     }
 
     private void initSlideMenu() {
@@ -104,17 +170,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         //当登录状态改变后，首页要进到默认Fragment下
-        viewPager.setCurrentItem(DEFAUT_FRAGMENT);
+        switchFragmentByIndex(1);
 
-    }
-
-    private void initViewPager() {
-        mainFragmentAdapter = new MainFragmentAdapter(getSupportFragmentManager());
-        viewPager = findViewById(R.id.viewPager);
-        TabLayout tabLayout = findViewById(R.id.tabLayout);
-        viewPager.setAdapter(mainFragmentAdapter);
-        tabLayout.setupWithViewPager(viewPager);
-        viewPager.setOffscreenPageLimit(3);
     }
 
     @Override
@@ -132,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.searchImg:
-                SearchActivity.launch(this);
+                SearchMVPActivity.launch(this);
                 break;
 
             case R.id.btnRecord:
@@ -161,8 +218,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void destroy() {
+        super.destroy();
         KSUserManager.getInstance().removeLoginListener(this);
     }
 
@@ -174,4 +231,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         activity.startActivity(intent);
     }
+
 }
